@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  redis:
+    image: bitnami/redis:latest
+    deploy:
+      replicas: 4 # Puedes ajustar a 2, 4, o 8 particiones
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/bitnami/redis/data
+
+  grpc-server:
+    build: ./grpc-server
+    ports:
+      - "50051:50051"
+    depends_on:
+      - redis
+
+  dns-resolver:
+    build: ./dns-resolver
+    depends_on:
+      - grpc-server
+
+  traffic-generator:
+    build: ./traffic-generator
+    depends_on:
+      - grpc-server
+
+volumes:x
+  redis_data:
+
+
