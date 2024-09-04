@@ -1,33 +1,38 @@
 version: '3.8'
 
+networks:
+  redisn:
+    driver: bridge
+
 services:
-  redis:
+  redis1:
     image: bitnami/redis:latest
-    deploy:
-      replicas: 4 # Puedes ajustar a 2, 4, o 8 particiones
+    restart: always
+    container_name: redis-server-1
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/bitnami/redis/data
+      - redis_data_1:/bitnami/redis/data
+    networks: 
+      - redisn
 
-  grpc-server:
-    build: ./grpc-server
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    restart: always
+    container_name: redis-insight
+    volumes: 
+      - redis-insight:/data
     ports:
-      - "50051:50051"
+      - "5540:5540" 
+    networks: 
+      - redisn
     depends_on:
-      - redis
-
-  dns-resolver:
-    build: ./dns-resolver
-    depends_on:
-      - grpc-server
-
-  traffic-generator:
-    build: ./traffic-generator
-    depends_on:
-      - grpc-server
-
-volumes:x
-  redis_data:
+      - redis1
 
 
+volumes:
+  redis_data_1:
+    driver: local
+  redis-insight:

@@ -1,2 +1,2 @@
 # Sist_Distribuidos
-Codigos de tareas deñ ramo de sistemas distribuidos
+Codigos de tareas del ramo de sistemas distribuidos
