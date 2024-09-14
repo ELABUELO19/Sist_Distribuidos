@@ -2,9 +2,11 @@
 
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/engine/reference/builder/
+# https://docs.docker.com/go/dockerfile-reference/
 
-ARG NODE_VERSION=20.12.0
+# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
+
+ARG NODE_VERSION=22.6.0
 
 FROM node:${NODE_VERSION}-alpine
 
@@ -18,10 +20,10 @@ WORKDIR /usr/src/app
 # Leverage a cache mount to /root/.npm to speed up subsequent builds.
 # Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
 # into this layer.
-COPY package.json .
-COPY package-lock.json .
-RUN npm ci --omit=dev
-
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev
 
 # Run the application as a non-root user.
 USER node
@@ -30,4 +32,4 @@ USER node
 COPY . .
 
 # Run the application.
-CMD node src/index.js
+CMD node index.js
